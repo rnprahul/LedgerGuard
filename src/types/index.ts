@@ -1,0 +1,124 @@
+export type NavigationPage = 
+  | 'overview' 
+  | 'tenants' 
+  | 'ledger' 
+  | 'transactions' 
+  | 'analytics' 
+  | 'security' 
+  | 'settings';
+
+export type TenantStatus = 'Active' | 'Provisioning' | 'Suspended';
+export type BillingPlan = 'Starter' | 'Growth' | 'Enterprise';
+export type IsolationZone = 'Dedicated Enclave' | 'Standard Virtual VPC' | 'Zero-Knowledge Vault';
+
+export interface Tenant {
+  id: string;
+  name: string;
+  code: string;
+  status: TenantStatus;
+  plan: BillingPlan;
+  isolationZone: IsolationZone;
+  createdAt: string;
+  monthlySpend: number;
+  quotaUsedPercent: number;
+  apiRequests: number;
+  contactEmail: string;
+  zkProofCount: number;
+}
+
+export type TransactionStatus = 'Completed' | 'Processing' | 'Flagged' | 'Failed';
+
+export interface Transaction {
+  id: string;
+  tenantId: string;
+  tenantName: string;
+  amount: number;
+  currency: string;
+  status: TransactionStatus;
+  timestamp: string;
+  description: string;
+  proofHash: string;
+  publicInputsHash: string;
+  processingNode: string;
+  breakdown: {
+    baseFee: number;
+    computeUnits: number;
+    isolationFee: number;
+    networkTax: number;
+  };
+}
+
+export type LedgerStatus = 'Settled' | 'Pending Settlement' | 'Audited' | 'Disputed';
+
+export interface LedgerEntry {
+  id: string;
+  transactionId: string;
+  tenantId: string;
+  tenantName: string;
+  description: string;
+  amount: number;
+  currency: string;
+  date: string;
+  status: LedgerStatus;
+  batchId: string;
+  signatureVerified: boolean;
+}
+
+export type SecuritySeverity = 'Normal' | 'Info' | 'Warning' | 'Critical';
+
+export interface AuditLogEntry {
+  id: string;
+  timestamp: string;
+  eventType: string;
+  tenantName: string;
+  tenantId: string;
+  actor: string;
+  severity: SecuritySeverity;
+  verificationProofId: string;
+  details: string;
+}
+
+export interface SecurityStatusSummary {
+  tenantIsolation: {
+    status: 'Isolated' | 'Degraded' | 'Compromised';
+    enclaveHealthPercent: number;
+    activeEnclaves: number;
+    crossTenantViolations: number;
+  };
+  authentication: {
+    status: 'Operational' | 'Warning' | 'Down';
+    tokenVerificationSuccessRate: number;
+    activeSessions: number;
+    mfaEnforcedPercent: number;
+  };
+  signatureVerification: {
+    status: 'Valid' | 'Anomalies Detected';
+    validatedCount: number;
+    failedSignatures: number;
+    cryptoAlgorithm: string;
+  };
+  zkEngine: {
+    status: 'Ready' | 'Proving' | 'Idle';
+    circuitVersion: string;
+    proofGenerationAvgMs: number;
+    verificationSuccessRate: number;
+  };
+}
+
+export interface NotificationItem {
+  id: string;
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  type: 'info' | 'success' | 'warning' | 'security';
+}
+
+export interface UserProfile {
+  name: string;
+  email: string;
+  role: string;
+  department: string;
+  securityClearance: string;
+  avatarUrl?: string;
+}
