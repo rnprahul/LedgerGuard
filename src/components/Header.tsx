@@ -6,10 +6,11 @@ import {
   CheckCircle2, 
   AlertTriangle, 
   ShieldCheck, 
-  Info,
-  ChevronDown,
-  User,
-  LogOut
+  Info, 
+  ChevronDown, 
+  User, 
+  LogOut,
+  Database
 } from 'lucide-react';
 import { NotificationItem, UserProfile, NavigationPage } from '../types';
 
@@ -20,6 +21,8 @@ interface HeaderProps {
   searchQuery: string;
   onSearchChange: (q: string) => void;
   onNavigate: (page: NavigationPage) => void;
+  isolatedDbName?: string;
+  onSignOut?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -28,7 +31,9 @@ export const Header: React.FC<HeaderProps> = ({
   userProfile,
   searchQuery,
   onSearchChange,
-  onNavigate
+  onNavigate,
+  isolatedDbName,
+  onSignOut
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -88,11 +93,27 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="header-right">
-        {/* Simulation / Demo Environment Pill */}
-        <div className="demo-pill-badge" title="Frontend preview with local state mock engine">
-          <span className="demo-pill-dot" />
-          <span>SIMULATION MODE</span>
-        </div>
+        {/* Live Isolated Database Enclave Pill */}
+        {isolatedDbName ? (
+          <div 
+            className="demo-pill-badge" 
+            style={{ 
+              backgroundColor: '#ecfdf5', 
+              borderColor: '#a7f3d0', 
+              color: '#065f46',
+              fontFamily: 'var(--font-mono)'
+            }}
+            title="Authenticated connection active to dynamic tenant-isolated database"
+          >
+            <Database size={12} color="#10b981" />
+            <span>DB: {isolatedDbName}</span>
+          </div>
+        ) : (
+          <div className="demo-pill-badge" title="Frontend preview with local state mock engine">
+            <span className="demo-pill-dot" />
+            <span>SIMULATION MODE</span>
+          </div>
+        )}
 
         {/* Notifications Dropdown */}
         <div style={{ position: 'relative' }} ref={notifRef}>
@@ -173,12 +194,12 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           {showProfileMenu && (
-            <div className="notifications-dropdown" style={{ width: '220px', right: 0 }}>
+            <div className="notifications-dropdown" style={{ width: '230px', right: 0 }}>
               <div style={{ padding: '0.875rem 1rem', borderBottom: '1px solid var(--border-subtle)' }}>
                 <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-main)' }}>
                   {userProfile.name}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', wordBreak: 'break-all' }}>
                   {userProfile.email}
                 </div>
                 <div style={{ 
@@ -229,11 +250,13 @@ export const Header: React.FC<HeaderProps> = ({
                   style={{ color: 'var(--danger)' }}
                   onClick={() => {
                     setShowProfileMenu(false);
-                    alert("Demo session reset: All mock state is running in local memory.");
+                    if (onSignOut) {
+                      onSignOut();
+                    }
                   }}
                 >
                   <LogOut size={15} />
-                  <span>Reset Demo Session</span>
+                  <span>Sign Out of Enclave</span>
                 </button>
               </div>
             </div>

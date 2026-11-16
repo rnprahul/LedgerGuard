@@ -10,6 +10,9 @@ interface DashboardLayoutProps {
   userProfile: UserProfile;
   searchQuery: string;
   onSearchChange: (q: string) => void;
+  isolatedDbName?: string;
+  tenantName?: string;
+  onSignOut?: () => void;
   children: React.ReactNode;
 }
 
@@ -20,6 +23,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   userProfile,
   searchQuery,
   onSearchChange,
+  isolatedDbName,
+  tenantName,
+  onSignOut,
   children
 }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -41,6 +47,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         onToggleCollapse={() => setCollapsed(!collapsed)}
         mobileOpen={mobileOpen}
         onCloseMobile={() => setMobileOpen(false)}
+        tenantName={tenantName}
+        isolatedDbName={isolatedDbName}
       />
 
       {/* Main Content Area */}
@@ -52,6 +60,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           searchQuery={searchQuery}
           onSearchChange={onSearchChange}
           onNavigate={onNavigate}
+          isolatedDbName={isolatedDbName}
+          onSignOut={onSignOut}
         />
 
         <main className="page-container">

@@ -122,3 +122,41 @@ export interface UserProfile {
   securityClearance: string;
   avatarUrl?: string;
 }
+
+export interface AuthUser {
+  id?: string;
+  sub?: string;
+  email: string;
+  name: string;
+  role: 'PLATFORM_ADMIN' | 'TENANT_ADMIN' | 'AUDITOR';
+  tenantId: string;
+  tenantName: string;
+}
+
+export interface TenantContextData {
+  databaseName: string;
+  profile: {
+    tenantId: string;
+    organizationName: string;
+    plan: 'ENTERPRISE' | 'GROWTH' | 'STARTER';
+    isolationZone: string;
+    status: 'ACTIVE' | 'SUSPENDED';
+    monthlyQuotaUsd: number;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+  recentAuditLogs: Array<{
+    _id?: string;
+    action: string;
+    actorEmail: string;
+    tenantId: string;
+    metadata: Record<string, any>;
+    timestamp: string;
+  }>;
+}
+
+export interface AuthSession {
+  token: string;
+  user: AuthUser;
+  tenantContext?: TenantContextData;
+}

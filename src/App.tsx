@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { Overview } from './pages/Overview';
 import { Tenants } from './pages/Tenants';
@@ -7,12 +7,14 @@ import { Transactions } from './pages/Transactions';
 import { Analytics } from './pages/Analytics';
 import { SecurityAudit } from './pages/SecurityAudit';
 import { Settings } from './pages/Settings';
+import { Login } from './pages/Login';
 import { 
   NavigationPage, 
   Tenant, 
   Transaction, 
   UserProfile, 
-  NotificationItem 
+  NotificationItem,
+  AuthSession
 } from './types';
 import { 
   INITIAL_TENANTS, 
@@ -21,9 +23,18 @@ import {
   INITIAL_NOTIFICATIONS, 
   INITIAL_USER_PROFILE 
 } from './data/demoData';
-import { CheckCircle2 } from 'lucide-react';
+import { 
+  getStoredToken, 
+  clearStoredToken, 
+  fetchCurrentUser, 
+  fetchTenantContext, 
+  onUnauthorized 
+} from './services/api';
+import { CheckCircle2, ShieldCheck } from 'lucide-react';
 
 export const App: React.FC = () => {
+  const [authSession, setAuthSession] = useState<AuthSession | null>(null);
+  const [isVerifyingSession, setIsVerifyingSession] = useState(true);
   const [currentPage, setCurrentPage] = useState<NavigationPage>('overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [tenants, setTenants] = useState<Tenant[]>(INITIAL_TENANTS);
@@ -41,6 +52,54 @@ export const App: React.FC = () => {
     setTimeout(() => {
       setToastMessage((current) => (current === message ? null : current));
     }, 3500);
+  };
+
+  // Restore and verify live session on initial load
+  useEffect(() => {
+    const unsub = onUnauthorized(() => {
+      setAuthSession(null);
+      showToast('Enclave session expired. Please sign in again.');
+    });
+
+    const verifyExistingToken = async () => {
+      const token = getStoredToken();
+      if (!token) {
+        setIsVerifyingSession(false);
+        return;
+      }
+
+      try {
+        const { user } = await fetchCurrentUser();
+        let tenantContext;
+        try {
+          tenantContext = await fetchTenantContext();
+        } catch (ctxErr) {
+          console.warn('Could not resolve tenant DB context:', ctxErr);
+        }
+
+        setAuthSession({ token, user, tenantContext });
+      } catch (err) {
+        clearStoredToken();
+        setAuthSession(null);
+      } finally {
+        setIsVerifyingSession(false);
+      }
+    };
+
+    verifyExistingToken();
+    return () => unsub();
+  }, []);
+
+  const handleLoginSuccess = (session: AuthSession) => {
+    setAuthSession(session);
+    showToast(`Authenticated as ${session.user.name} (${session.user.tenantName})`);
+  };
+
+  const handleSignOut = () => {
+    clearStoredToken();
+    setAuthSession(null);
+    setCurrentPage('overview');
+    showToast('Signed out of tenant enclave.');
   };
 
   const handleAddTenant = (newTenant: Tenant) => {
@@ -63,6 +122,65 @@ export const App: React.FC = () => {
       setCurrentPage('transactions');
     }
   };
+
+  // Compute live user profile from authenticated session
+  const activeUserProfile: UserProfile = authSession ? {
+    name: authSession.user.name,
+    email: authSession.user.email,
+    role: authSession.user.role === 'PLATFORM_ADMIN' ? 'Platform Security Officer' : `${authSession.user.tenantName} Admin`,
+    department: `${authSession.user.tenantName} Enclave`,
+    securityClearance: authSession.user.role === 'PLATFORM_ADMIN' ? 'Level 4 (Root Clearance)' : 'Level 3 (Isolated Tenant Enclave)',
+  } : userProfile;
+
+  // Session verification loading splash
+  if (isVerifyingSession) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#090e1a',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        gap: '1rem',
+        color: '#f8fafc'
+      }}>
+        <div style={{
+          width: '48px',
+          height: '48px',
+          borderRadius: '12px',
+          background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 8px 24px rgba(37, 99, 235, 0.4)'
+        }}>
+          <ShieldCheck size={28} color="#ffffff" />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: '#94a3b8' }}>
+          <span className="status-dot-pulse" style={{ backgroundColor: '#3b82f6' }} />
+          <span>Connecting to LedgerGuard Gateway & Enclaves...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // If unauthenticated, render enterprise Login Portal
+  if (!authSession) {
+    return (
+      <>
+        <Login onLoginSuccess={handleLoginSuccess} />
+        {toastMessage && (
+          <div className="toast-container">
+            <div className="toast">
+              <CheckCircle2 size={18} color="#10b981" />
+              <span>{toastMessage}</span>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  }
 
   const renderCurrentPage = () => {
     switch (currentPage) {
@@ -107,7 +225,7 @@ export const App: React.FC = () => {
       case 'settings':
         return (
           <Settings
-            userProfile={userProfile}
+            userProfile={activeUserProfile}
             onUpdateProfile={setUserProfile}
             onShowToast={showToast}
           />
@@ -129,9 +247,12 @@ export const App: React.FC = () => {
       currentPage={currentPage}
       onNavigate={setCurrentPage}
       notifications={notifications}
-      userProfile={userProfile}
+      userProfile={activeUserProfile}
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
+      isolatedDbName={authSession.tenantContext?.databaseName}
+      tenantName={authSession.user.tenantName}
+      onSignOut={handleSignOut}
     >
       {renderCurrentPage()}
 

@@ -20,6 +20,8 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   mobileOpen: boolean;
   onCloseMobile: () => void;
+  tenantName?: string;
+  isolatedDbName?: string;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -28,7 +30,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   collapsed,
   onToggleCollapse,
   mobileOpen,
-  onCloseMobile
+  onCloseMobile,
+  tenantName,
+  isolatedDbName
 }) => {
   const navItems = [
     { id: 'overview' as NavigationPage, label: 'Overview', icon: LayoutDashboard },
@@ -73,7 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Navigation Links */}
       <nav className="sidebar-nav">
-        {!collapsed && <div className="nav-section-title">Billing Engine Engine</div>}
+        {!collapsed && <div className="nav-section-title">Billing Engine</div>}
         
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -99,14 +103,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="sidebar-status-box">
             <div className="status-dot-pulse" />
             <div className="sidebar-status-info">
-              <div className="sidebar-status-title">ZK-Enclaves Active</div>
-              <div className="sidebar-status-sub">Zero-Knowledge Verifier v2.4</div>
+              <div className="sidebar-status-title">
+                {tenantName || 'ZK-Enclaves Active'}
+              </div>
+              <div className="sidebar-status-sub" title={isolatedDbName}>
+                {isolatedDbName ? `DB: ${isolatedDbName}` : 'Zero-Knowledge Verifier v2.4'}
+              </div>
             </div>
           </div>
         </div>
       ) : (
         <div className="sidebar-footer" style={{ display: 'flex', justifyContent: 'center' }}>
-          <div className="status-dot-pulse" title="Zero-Knowledge Isolation: Active" />
+          <div 
+            className="status-dot-pulse" 
+            title={isolatedDbName ? `Enclave Active: ${isolatedDbName}` : 'Zero-Knowledge Isolation: Active'} 
+          />
         </div>
       )}
     </aside>

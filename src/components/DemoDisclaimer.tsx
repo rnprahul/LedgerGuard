@@ -7,14 +7,14 @@ interface DemoDisclaimerProps {
 }
 
 export const DemoDisclaimer: React.FC<DemoDisclaimerProps> = ({ 
-  message = "SIMULATED ENVIRONMENT: All financial, tenant, and cryptographic records shown are synthetic demo models for frontend architecture validation.",
+  message = "WEEK 1 LIVE ARCHITECTURE: JWT Authentication and isolated tenant databases are LIVE. Transaction batches and ZK-proof charts remain simulated until Weeks 2–3.",
   variant = 'banner' 
 }) => {
   if (variant === 'pill') {
     return (
-      <span className="demo-pill-badge" title="This interface renders mock data for architecture preview">
-        <span className="demo-pill-dot" />
-        DEMO MODE
+      <span className="demo-pill-badge" title="Live auth & isolated DB with simulated billing engine">
+        <span className="demo-pill-dot" style={{ backgroundColor: '#10b981' }} />
+        LIVE DB / DEMO ENGINE
       </span>
     );
   }
@@ -33,7 +33,7 @@ export const DemoDisclaimer: React.FC<DemoDisclaimerProps> = ({
         gap: '0.5rem'
       }}>
         <Info size={14} color="var(--primary)" style={{ flexShrink: 0 }} />
-        <span>Simulated UI demonstration data. Not live cryptographic or ledger state.</span>
+        <span>Authentication and database isolation are live. Ledger data is simulated for Week 1 demonstration.</span>
       </div>
     );
   }
@@ -43,7 +43,9 @@ export const DemoDisclaimer: React.FC<DemoDisclaimerProps> = ({
       <div className="demo-banner-content">
         <ShieldCheck size={18} color="var(--primary)" style={{ flexShrink: 0 }} />
         <div>
-          <span className="demo-banner-tag">Simulation Mode</span>
+          <span className="demo-banner-tag" style={{ backgroundColor: '#ecfdf5', color: '#059669' }}>
+            Live Tenant DB
+          </span>
           <span style={{ marginLeft: '0.5rem' }}>{message}</span>
         </div>
       </div>
