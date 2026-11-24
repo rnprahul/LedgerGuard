@@ -9,6 +9,8 @@ export interface EnvironmentConfig {
   MONGO_BASE_URI: string;
   JWT_SECRET: string;
   JWT_EXPIRES_IN: string;
+  REDIS_URL: string;
+  LOCK_TTL_MS: number;
 }
 
 const getEnvNumber = (key: string, defaultValue: number): number => {
@@ -25,6 +27,8 @@ export const env: EnvironmentConfig = {
   MONGO_BASE_URI: process.env.MONGO_BASE_URI || 'mongodb://127.0.0.1:27017',
   JWT_SECRET: process.env.JWT_SECRET || 'ledgerguard_dev_secret_change_in_production',
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '8h',
+  REDIS_URL: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
+  LOCK_TTL_MS: getEnvNumber('LOCK_TTL_MS', 10000),
 };
 
 // Validate critical config in non-test environments

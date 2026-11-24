@@ -13,7 +13,8 @@ export const loginHandler = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { email, password } = req.body;
+    const body = req.body && typeof req.body === 'object' ? req.body : {};
+    const { email, password } = body;
 
     if (!email || typeof email !== 'string' || !password || typeof password !== 'string') {
       return next(
@@ -49,18 +50,22 @@ export const getMeHandler = (
   res: Response,
   next: NextFunction
 ): void => {
-  if (!req.auth) {
-    return next(new AppError('Authentication context missing', 401, 'UNAUTHORIZED'));
-  }
+  try {
+    if (!req.auth) {
+      return next(new AppError('Authentication context missing', 401, 'UNAUTHORIZED'));
+    }
 
-  res.status(200).json({
-    success: true,
-    data: {
-      user: req.auth,
-      tenantContext: {
-        tenantId: req.auth.tenantId,
-        tenantName: req.auth.tenantName,
+    res.status(200).json({
+      success: true,
+      data: {
+        user: req.auth,
+        tenantContext: {
+          tenantId: req.auth.tenantId,
+          tenantName: req.auth.tenantName,
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    next(error);
+  }
 };

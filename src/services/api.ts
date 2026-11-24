@@ -1,4 +1,11 @@
-import { AuthUser, TenantContextData } from '../types';
+import { 
+  AuthUser, 
+  TenantContextData, 
+  BillingSummaryResponse, 
+  BillingTransactionsResponse, 
+  CreateBillingTransactionPayload, 
+  CreateBillingTransactionResponse 
+} from '../types';
 
 const TOKEN_KEY = 'ledgerguard_token';
 
@@ -115,4 +122,86 @@ export async function fetchTenantContext(): Promise<TenantContextData> {
   return apiFetch<TenantContextData>('/api/v1/tenant/context', {
     method: 'GET',
   });
+}
+
+/**
+ * Retrieves the current tenant's account balance and recent transactions via GET /api/v1/billing/summary
+ */
+export async function fetchBillingSummary(): Promise<BillingSummaryResponse> {
+  return apiFetch<BillingSummaryResponse>('/api/v1/billing/summary', {
+    method: 'GET',
+  });
+}
+
+/**
+ * Retrieves paginated ledger transactions isolated to the current tenant via GET /api/v1/billing/transactions
+ */
+export async function fetchBillingTransactions(params?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+  type?: string;
+}): Promise<BillingTransactionsResponse> {
+  const query = new URLSearchParams();
+  if (params?.page) query.set('page', String(params.page));
+  if (params?.limit) query.set('limit', String(params.limit));
+  if (params?.status && params.status !== 'All') query.set('status', params.status);
+  if (params?.type && params.type !== 'All') query.set('type', params.type);
+
+  const qs = query.toString();
+  const endpoint = qs ? `/api/v1/billing/transactions?${qs}` : '/api/v1/billing/transactions';
+
+  return apiFetch<BillingTransactionsResponse>(endpoint, {
+    method: 'GET',
+  });
+}
+
+/**
+ * Executes an atomic idempotent transaction via POST /api/v1/billing/transactions
+ * Sends the Idempotency-Key header and returns { data, replayed }
+ */
+export async function submitBillingTransaction(
+  payload: CreateBillingTransactionPayload,
+  idempotencyKey: string
+): Promise<{ data: CreateBillingTransactionResponse; replayed: boolean }> {
+  const token = getStoredToken();
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Idempotency-Key': idempotencyKey.trim(),
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch('/api/v1/billing/transactions', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(payload),
+  });
+
+  const json: ApiResponse<CreateBillingTransactionResponse> & { replayed?: boolean } = await response
+    .json()
+    .catch(() => ({
+      success: false,
+      message: `Server returned non-JSON response (${response.status})`,
+    }));
+
+  if (response.status === 401) {
+    notifyUnauthorized();
+    throw new Error(json.message || 'Session expired or invalid credentials');
+  }
+
+  if (!response.ok || !json.success) {
+    throw new Error(json.message || `Transaction submission failed with status ${response.status}`);
+  }
+
+  const isReplayed =
+    response.headers.get('x-idempotency-replayed') === 'true' || Boolean(json.replayed);
+
+  return {
+    data: json.data as CreateBillingTransactionResponse,
+    replayed: isReplayed,
+  };
 }

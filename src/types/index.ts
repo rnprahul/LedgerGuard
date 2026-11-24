@@ -160,3 +160,67 @@ export interface AuthSession {
   user: AuthUser;
   tenantContext?: TenantContextData;
 }
+
+export type LedgerTransactionType = 'CHARGE' | 'CREDIT' | 'ESCROW_HOLD' | 'SETTLEMENT';
+export type LedgerTransactionStatus = 'COMMITTED' | 'ROLLED_BACK' | 'PENDING';
+
+export interface LedgerTransactionItem {
+  _id?: string;
+  transactionId: string;
+  idempotencyKey: string;
+  tenantId: string;
+  type: LedgerTransactionType;
+  amountUsd: number;
+  netAmountUsd: number;
+  feeUsd: number;
+  currency: string;
+  counterparty: string;
+  description: string;
+  status: LedgerTransactionStatus;
+  balanceBeforeUsd: number;
+  balanceAfterUsd: number;
+  acidMode: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface TenantAccountBalanceData {
+  tenantId: string;
+  currency: string;
+  settledBalanceUsd: number;
+  pendingEscrowUsd: number;
+  totalSettledVolumeUsd: number;
+  transactionCount: number;
+  updatedAt?: string;
+}
+
+export interface BillingSummaryResponse {
+  accountBalance: TenantAccountBalanceData;
+  recentTransactions: LedgerTransactionItem[];
+  totalSettledVolumeUsd: number;
+  transactionCount: number;
+}
+
+export interface BillingTransactionsResponse {
+  transactions: LedgerTransactionItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface CreateBillingTransactionPayload {
+  type: LedgerTransactionType;
+  amountUsd: number;
+  counterparty: string;
+  description?: string;
+  feeUsd?: number;
+  simulateFailure?: boolean;
+}
+
+export interface CreateBillingTransactionResponse {
+  transaction: LedgerTransactionItem;
+  accountBalance: TenantAccountBalanceData;
+  lockEngine: string;
+  acidMode: string;
+}

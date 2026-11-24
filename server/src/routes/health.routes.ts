@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import { getRedisStatus } from '../config/redis';
 
 const router = Router();
 
@@ -8,6 +9,8 @@ const router = Router();
  * @access  Public
  */
 router.get('/', (_req: Request, res: Response) => {
+  const redisStatus = getRedisStatus();
+
   res.status(200).json({
     success: true,
     service: 'LedgerGuard API Gateway',
@@ -15,6 +18,8 @@ router.get('/', (_req: Request, res: Response) => {
     capabilities: {
       auth: 'jwt-bearer',
       tenantIsolation: 'claim-enforced',
+      distributedLock: redisStatus.mode,
+      idempotentLedger: 'enforced',
     },
     timestamp: new Date().toISOString(),
   });
