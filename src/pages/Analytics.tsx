@@ -150,12 +150,19 @@ export const Analytics: React.FC = () => {
                     <stop offset="95%" stopColor="#0284c7" stopOpacity={0.0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
                 <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} tickLine={false} />
                 <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} tickFormatter={(v) => `$${v / 1000}k`} />
                 <Tooltip 
                   formatter={(val: number) => [`$${val.toLocaleString()}`, '']}
-                  contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                  contentStyle={{ 
+                    backgroundColor: 'var(--bg-surface)', 
+                    borderRadius: '8px', 
+                    border: '1px solid var(--border-subtle)', 
+                    color: 'var(--text-main)',
+                    boxShadow: 'var(--shadow-md)' 
+                  }}
+                  itemStyle={{ color: 'var(--text-main)' }}
                 />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '0.8125rem', paddingTop: '10px' }} />
                 <Area type="monotone" dataKey="enterpriseRevenue" name="Enterprise Enclave Billing" stroke="#2563eb" strokeWidth={2.5} fillOpacity={1} fill="url(#anEnterprise)" />
@@ -196,7 +203,14 @@ export const Analytics: React.FC = () => {
                 </Pie>
                 <Tooltip 
                   formatter={(val: number) => [`$${val.toLocaleString()}`, 'Monthly Spend']}
-                  contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                  contentStyle={{ 
+                    backgroundColor: 'var(--bg-surface)', 
+                    borderRadius: '8px', 
+                    border: '1px solid var(--border-subtle)', 
+                    color: 'var(--text-main)',
+                    boxShadow: 'var(--shadow-md)' 
+                  }}
+                  itemStyle={{ color: 'var(--text-main)' }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -231,12 +245,19 @@ export const Analytics: React.FC = () => {
           <div style={{ width: '100%', height: 260 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={MONTHLY_USAGE_DATA} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
                 <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} tickLine={false} />
                 <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} />
                 <Tooltip 
                   formatter={(val: number) => [val.toLocaleString(), 'Compute Hours']}
-                  contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                  contentStyle={{ 
+                    backgroundColor: 'var(--bg-surface)', 
+                    borderRadius: '8px', 
+                    border: '1px solid var(--border-subtle)', 
+                    color: 'var(--text-main)',
+                    boxShadow: 'var(--shadow-md)' 
+                  }}
+                  itemStyle={{ color: 'var(--text-main)' }}
                 />
                 <Bar dataKey="computeHours" name="Compute Hours" fill="#2563eb" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -260,12 +281,19 @@ export const Analytics: React.FC = () => {
           <div style={{ width: '100%', height: 260 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={MONTHLY_USAGE_DATA} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
                 <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} tickLine={false} />
                 <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} />
                 <Tooltip 
                   formatter={(val: number) => [`${val}M`, 'Proofs Generated']}
-                  contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                  contentStyle={{ 
+                    backgroundColor: 'var(--bg-surface)', 
+                    borderRadius: '8px', 
+                    border: '1px solid var(--border-subtle)', 
+                    color: 'var(--text-main)',
+                    boxShadow: 'var(--shadow-md)' 
+                  }}
+                  itemStyle={{ color: 'var(--text-main)' }}
                 />
                 <Bar dataKey="zkProofsM" name="ZK Proofs (M)" fill="#7c3aed" radius={[4, 4, 0, 0]} />
               </BarChart>

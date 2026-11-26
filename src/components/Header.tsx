@@ -10,9 +10,13 @@ import {
   ChevronDown, 
   User, 
   LogOut,
-  Database
+  Database,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { NotificationItem, UserProfile, NavigationPage } from '../types';
+import { ThemeToggle } from './ThemeToggle';
+import { useTheme } from '../context/ThemeContext';
 
 interface HeaderProps {
   onOpenMobileMenu: () => void;
@@ -41,6 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
   const profileRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter(n => !n.read).length;
+  const { theme, isDark, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -114,6 +119,9 @@ export const Header: React.FC<HeaderProps> = ({
             <span>SIMULATION MODE</span>
           </div>
         )}
+
+        {/* Theme Toggle Button */}
+        <ThemeToggle />
 
         {/* Notifications Dropdown */}
         <div style={{ position: 'relative' }} ref={notifRef}>
@@ -240,6 +248,27 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <ShieldCheck size={15} />
                   <span>Security Status</span>
+                </button>
+                <button 
+                  type="button" 
+                  className="nav-item" 
+                  style={{ color: 'var(--text-secondary)', display: 'flex', justifyContent: 'space-between' }}
+                  onClick={toggleTheme}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                    {isDark ? <Sun size={15} color="#f59e0b" /> : <Moon size={15} color="var(--primary)" />}
+                    <span>{isDark ? 'Switch to Light' : 'Switch to Dark'}</span>
+                  </span>
+                  <span style={{ 
+                    fontSize: '0.6875rem', 
+                    padding: '0.1rem 0.4rem', 
+                    borderRadius: '4px', 
+                    backgroundColor: 'var(--bg-surface-alt)', 
+                    border: '1px solid var(--border-subtle)',
+                    textTransform: 'uppercase'
+                  }}>
+                    {theme}
+                  </span>
                 </button>
               </div>
 

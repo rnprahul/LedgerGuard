@@ -6,10 +6,13 @@ import {
   Key, 
   Save, 
   Copy, 
-  Check
+  Check,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { UserProfile } from '../types';
 import { DemoDisclaimer } from '../components/DemoDisclaimer';
+import { useTheme } from '../context/ThemeContext';
 
 interface SettingsProps {
   userProfile: UserProfile;
@@ -28,6 +31,7 @@ export const Settings: React.FC<SettingsProps> = ({
   const [circuitOptimization, setCircuitOptimization] = useState('High Throughput (Groth16)');
   const [alertThreshold, setAlertThreshold] = useState('85%');
   const [copiedKey, setCopiedKey] = useState(false);
+  const { theme, isDark, setTheme } = useTheme();
 
   const handleSavePreferences = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +69,92 @@ export const Settings: React.FC<SettingsProps> = ({
       <DemoDisclaimer message="SIMULATED CONFIGURATION: Preference changes persist in local React state for your current dashboard evaluation session." />
 
       <form id="settings-form" onSubmit={handleSavePreferences} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {/* Appearance & Color Theme Card */}
+        <div className="card">
+          <div className="card-header">
+            <div>
+              <div className="card-title">
+                {isDark ? <Moon size={18} color="var(--primary)" /> : <Sun size={18} color="#d97706" />}
+                <span>Appearance & Color Theme</span>
+              </div>
+              <div className="card-subtitle">Select your preferred interface display mode for dashboard views and audit workflows</div>
+            </div>
+            <span className="demo-pill-badge" style={{ textTransform: 'uppercase' }}>
+              ACTIVE: {theme}
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+            {/* Light Mode Option */}
+            <div 
+              onClick={() => {
+                setTheme('light');
+                onShowToast('Switched to Light Theme');
+              }}
+              style={{
+                cursor: 'pointer',
+                padding: '1.25rem',
+                borderRadius: 'var(--radius-lg)',
+                border: !isDark ? '2px solid var(--primary)' : '1px solid var(--border-subtle)',
+                backgroundColor: !isDark ? 'var(--primary-light)' : 'var(--bg-surface-alt)',
+                transition: 'all var(--transition-fast)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.6rem'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.9375rem', color: 'var(--text-main)' }}>
+                  <Sun size={18} color="#d97706" />
+                  <span>Light Theme</span>
+                </div>
+                {!isDark && (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 700 }}>
+                    <Check size={14} /> Active
+                  </span>
+                )}
+              </div>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                High-contrast daytime enterprise interface with clean white cards and navy accents.
+              </p>
+            </div>
+
+            {/* Dark Mode Option */}
+            <div 
+              onClick={() => {
+                setTheme('dark');
+                onShowToast('Switched to Dark Theme');
+              }}
+              style={{
+                cursor: 'pointer',
+                padding: '1.25rem',
+                borderRadius: 'var(--radius-lg)',
+                border: isDark ? '2px solid var(--primary)' : '1px solid var(--border-subtle)',
+                backgroundColor: isDark ? 'var(--primary-light)' : 'var(--bg-surface-alt)',
+                transition: 'all var(--transition-fast)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.6rem'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.9375rem', color: 'var(--text-main)' }}>
+                  <Moon size={18} color="#60a5fa" />
+                  <span>Dark Theme</span>
+                </div>
+                {isDark && (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 700 }}>
+                    <Check size={14} /> Active
+                  </span>
+                )}
+              </div>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                Deep obsidian and slate dark palette optimized for continuous monitoring and audit workflows.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* User Profile Card */}
         <div className="card">
           <div className="card-header">

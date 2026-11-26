@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { loginRequest, setStoredToken, fetchTenantContext } from '../services/api';
 import { AuthSession } from '../types';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 interface LoginProps {
   onLoginSuccess: (session: AuthSession) => void;
@@ -139,6 +140,11 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         pointerEvents: 'none'
       }} />
 
+      {/* Top Corner Dark/Light Mode Toggle */}
+      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10 }}>
+        <ThemeToggle />
+      </div>
+
       <div style={{
         position: 'absolute',
         width: '500px',
@@ -149,6 +155,11 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         right: '-100px',
         pointerEvents: 'none'
       }} />
+
+      {/* Top Corner Dark/Light Mode Toggle */}
+      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10 }}>
+        <ThemeToggle />
+      </div>
 
       <div style={{
         width: '100%',

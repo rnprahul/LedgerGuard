@@ -1008,7 +1008,8 @@ export const BillingLedger: React.FC<BillingLedgerProps> = ({
                   fontSize: '0.8125rem', 
                   borderRadius: 'var(--radius-sm)', 
                   border: '1px solid var(--border-strong)',
-                  backgroundColor: '#ffffff'
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-main)'
                 }}
                 required
               />

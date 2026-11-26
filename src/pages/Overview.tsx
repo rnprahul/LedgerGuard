@@ -149,17 +149,19 @@ export const Overview: React.FC<OverviewProps> = ({
                     <stop offset="95%" stopColor="#0284c7" stopOpacity={0.0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
                 <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} tickLine={false} />
                 <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} tickFormatter={(v) => `$${v / 1000}k`} />
                 <Tooltip 
                   formatter={(val: number) => [`$${val.toLocaleString()}`, '']}
                   contentStyle={{ 
-                    backgroundColor: '#ffffff', 
+                    backgroundColor: 'var(--bg-surface)', 
                     borderRadius: '8px', 
-                    border: '1px solid #e2e8f0', 
-                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' 
+                    border: '1px solid var(--border-subtle)', 
+                    color: 'var(--text-main)',
+                    boxShadow: 'var(--shadow-md)' 
                   }}
+                  itemStyle={{ color: 'var(--text-main)' }}
                 />
                 <Area type="monotone" dataKey="enterpriseRevenue" name="Enterprise Tier" stroke="#2563eb" strokeWidth={2} fillOpacity={1} fill="url(#colorEnterprise)" />
                 <Area type="monotone" dataKey="growthRevenue" name="Growth Tier" stroke="#0284c7" strokeWidth={2} fillOpacity={1} fill="url(#colorGrowth)" />
@@ -187,17 +189,19 @@ export const Overview: React.FC<OverviewProps> = ({
           <div style={{ width: '100%', height: 280 }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={TRANSACTION_ACTIVITY_DATA} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
                 <XAxis dataKey="time" stroke="#94a3b8" fontSize={11} tickLine={false} />
                 <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
                 <Tooltip 
                   formatter={(val: number, name: string) => [val.toLocaleString(), name === 'volume' ? 'Transactions' : name]}
                   contentStyle={{ 
-                    backgroundColor: '#ffffff', 
+                    backgroundColor: 'var(--bg-surface)', 
                     borderRadius: '8px', 
-                    border: '1px solid #e2e8f0', 
-                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' 
+                    border: '1px solid var(--border-subtle)', 
+                    color: 'var(--text-main)',
+                    boxShadow: 'var(--shadow-md)' 
                   }}
+                  itemStyle={{ color: 'var(--text-main)' }}
                 />
                 <Line type="monotone" dataKey="volume" name="Verified Volume" stroke="#7c3aed" strokeWidth={2.5} dot={{ r: 3 }} />
               </LineChart>
