@@ -40,7 +40,7 @@ export const App: React.FC = () => {
   const [tenants, setTenants] = useState<Tenant[]>(INITIAL_TENANTS);
   const [transactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
   const [ledgerEntries] = useState(INITIAL_LEDGER_ENTRIES);
-  const [notifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
   const [userProfile, setUserProfile] = useState<UserProfile>(INITIAL_USER_PROFILE);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
@@ -121,6 +121,16 @@ export const App: React.FC = () => {
     if (tx && currentPage !== 'transactions') {
       setCurrentPage('transactions');
     }
+  };
+
+  const handleDismissNotification = (id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    showToast('Notification marked as read');
+  };
+
+  const handleClearAllNotifications = () => {
+    setNotifications([]);
+    showToast('All notifications cleared');
   };
 
   // Compute live user profile from authenticated session
@@ -253,6 +263,8 @@ export const App: React.FC = () => {
       isolatedDbName={authSession.tenantContext?.databaseName}
       tenantName={authSession.user.tenantName}
       onSignOut={handleSignOut}
+      onDismissNotification={handleDismissNotification}
+      onClearAllNotifications={handleClearAllNotifications}
     >
       {renderCurrentPage()}
 

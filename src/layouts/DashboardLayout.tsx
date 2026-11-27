@@ -13,6 +13,8 @@ interface DashboardLayoutProps {
   isolatedDbName?: string;
   tenantName?: string;
   onSignOut?: () => void;
+  onDismissNotification?: (id: string) => void;
+  onClearAllNotifications?: () => void;
   children: React.ReactNode;
 }
 
@@ -26,6 +28,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   isolatedDbName,
   tenantName,
   onSignOut,
+  onDismissNotification,
+  onClearAllNotifications,
   children
 }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -62,6 +66,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           onNavigate={onNavigate}
           isolatedDbName={isolatedDbName}
           onSignOut={onSignOut}
+          onDismissNotification={onDismissNotification}
+          onClearAllNotifications={onClearAllNotifications}
         />
 
         <main className="page-container">

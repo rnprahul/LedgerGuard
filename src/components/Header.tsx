@@ -12,7 +12,8 @@ import {
   LogOut,
   Database,
   Sun,
-  Moon
+  Moon,
+  Check
 } from 'lucide-react';
 import { NotificationItem, UserProfile, NavigationPage } from '../types';
 import { ThemeToggle } from './ThemeToggle';
@@ -27,6 +28,8 @@ interface HeaderProps {
   onNavigate: (page: NavigationPage) => void;
   isolatedDbName?: string;
   onSignOut?: () => void;
+  onDismissNotification?: (id: string) => void;
+  onClearAllNotifications?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -37,7 +40,9 @@ export const Header: React.FC<HeaderProps> = ({
   onSearchChange,
   onNavigate,
   isolatedDbName,
-  onSignOut
+  onSignOut,
+  onDismissNotification,
+  onClearAllNotifications
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -93,7 +98,6 @@ export const Header: React.FC<HeaderProps> = ({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
           />
-          <span className="header-search-shortcut">⌘K</span>
         </div>
       </div>
 
@@ -138,30 +142,69 @@ export const Header: React.FC<HeaderProps> = ({
           {showNotifications && (
             <div className="notifications-dropdown">
               <div className="notifications-header">
-                <span>System Notifications</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  {unreadCount} unread
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <span>System Notifications</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    ({unreadCount} unread)
+                  </span>
+                </div>
+                {notifications.length > 0 && onClearAllNotifications && (
+                  <button 
+                    type="button" 
+                    onClick={onClearAllNotifications}
+                    style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    Clear All
+                  </button>
+                )}
               </div>
               <div className="notifications-list">
-                {notifications.map((item) => (
-                  <div key={item.id} className={`notification-item ${!item.read ? 'unread' : ''}`}>
-                    <div style={{ marginTop: '2px' }}>
-                      {getNotifIcon(item.type)}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-main)' }}>
-                        {item.title}
-                      </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                        {item.message}
-                      </div>
-                      <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                        {item.timestamp}
-                      </div>
+                {notifications.length === 0 ? (
+                  <div style={{ padding: '2.5rem 1rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                    <CheckCircle2 size={32} color="var(--success)" style={{ margin: '0 auto 0.6rem', display: 'block', opacity: 0.85 }} />
+                    <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-main)' }}>All Caught Up!</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                      No active notifications in your enclave stream.
                     </div>
                   </div>
-                ))}
+                ) : (
+                  notifications.map((item) => (
+                    <div key={item.id} className={`notification-item ${!item.read ? 'unread' : ''}`}>
+                      <div style={{ marginTop: '2px' }}>
+                        {getNotifIcon(item.type)}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                          {item.title}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                          {item.message}
+                        </div>
+                        <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                          {item.timestamp}
+                        </div>
+                      </div>
+
+                      {/* Overlapping Double Exposure "Read" Overlay */}
+                      <div className="notification-read-overlay">
+                        <button
+                          type="button"
+                          className="notification-read-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (onDismissNotification) {
+                              onDismissNotification(item.id);
+                            }
+                          }}
+                          title="Mark as read and remove notification"
+                        >
+                          <Check size={14} strokeWidth={2.6} />
+                          <span>Read</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
               <div style={{ 
                 padding: '0.6rem', 
